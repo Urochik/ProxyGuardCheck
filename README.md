@@ -13,7 +13,7 @@ ProxyGuardCheck отправляет HTTP-запрос к указанному U
 > Автор не несёт ответственности за использование в противоправных целях.
 
 ## 🚀 Установка
-git clone https://github.com/user/ProxyGuardCheck.git
+git clone https://github.com/Urochik/ProxyGuardCheck.git
 cd ProxyGuardCheck
 pip install requests
 
