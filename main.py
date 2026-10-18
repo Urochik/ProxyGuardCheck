@@ -28,11 +28,18 @@ while True:
         elif headers.get('Server') == 'rdwr':
             cookie = headers.get('Set-Cookie')
             print(f'server: {headers.get("Server")}: \n Cookie: {cookie} \n age: {headers.get("age")}')
-        elif headers.get('x-vercel-cache')!=None or headers.get('x-vercel-id')!=None or headers.get('Server')!=None:
-            if headers.__contains__('x-vercel-cache') or headers.__contains__('x-vercel-id') or headers.get('Server')== 'Vercel':
-                print(f'server: vercel: \n x-vercel-id: {headers.get("x-vercel-id")} \n x-vercel-cache: {headers.get("x-vercel-cache")} \n Etag: {headers.get("Etag")} \n Last-Modified: {headers.get("Last-Modified")} \n age: {headers.get("age")}')
         elif headers.get('Server') == 'ddos-guard':
-            print(f'server: {headers.get('Server')} \n Cookie: {headers.get("Set-Cookie")} \n age: {headers.get("age")}')
+            print(f'server: {headers.get('Server')}: \n Cookie: {headers.get("Set-Cookie")} \n age: {headers.get("age")}')
+        elif headers.get('Server') == 'Angie':
+            print(f'server: {headers.get('Server' )}: \n Etag: {headers.get('Eta')} \n X-Cluster: {headers.get("X-Cluster")} \n X-Hit: {headers.get("X-Hit")}')
+
+
+
+
+
+        elif headers.get('x-vercel-cache')!=None or headers.get('x-vercel-id')!=None or headers.get('Server')!=None:
+           if headers.__contains__('x-vercel-cache') or headers.__contains__('x-vercel-id') or headers.get('Server')== 'Vercel':
+                print(f'server: vercel: \n x-vercel-id: {headers.get("x-vercel-id")} \n x-vercel-cache: {headers.get("x-vercel-cache")} \n Etag: {headers.get("Etag")} \n Last-Modified: {headers.get("Last-Modified")} \n age: {headers.get("age")}')
         elif headers.get('Server')!=None:
             if headers.get('Server').__contains__('Caddy') or headers.get('Server').__contains__('nginx'):
                 print(f'server: {headers.get("Server")}: \n X-Node: {headers.get("X-Node")} \n age: {headers.get('age')} \n {headers.get("Alt-Svc")} \n Etag: {headers.get("Etag")} \n Last-Modified: {headers.get("Last-Modified")} ')
