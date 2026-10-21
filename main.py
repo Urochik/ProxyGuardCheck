@@ -5,6 +5,15 @@
 import requests
 
 
+def get_cookie_from_header(headers, cookie_name):
+    set_cookie = headers.get('Set-Cookie', '')
+    cookies = {}
+    for part in set_cookie.split(','):
+        key_value = part.split(';', 1)[0].strip()
+        if '=' in key_value:
+            key, value = key_value.split('=', 1)
+            cookies[key.strip()] = value.strip()
+    return cookies.get(cookie_name, '')
 while True:
     try:
         print(f'Proxy/AntiDDOS cheker v0.1')
@@ -19,38 +28,100 @@ while True:
         r = requests.get(fix_url)
         headers = r.headers
 
-        if headers.get('server') == 'cloudflare': # cloudflare check
-            print(f'server: cloudflare: \n cf-ray: {headers.get("CF-Ray")} \n CF-Cache-Status: {headers.get("CF-Cache-Status")} \n age: {headers.get("age")}')
+        if headers.get('server') == 'cloudflare' or headers.__contains__('cf-ray') or headers.__contains__('cf-cache-status'): # cloudflare check
+            print(f'server: cloudflare: \n'
+                  f' cf-ray: {headers.get("CF-Ray")} \n'
+                  f' __cf_bm: {get_cookie_from_header(headers,'__cf_bm')} \n'
+                  f' CF-Cache-Status: {headers.get("CF-Cache-Status")} \n'
+                  f' age: {headers.get("age")}')
         elif headers.__contains__('X-Akam-SW-Version'):
-            print(f'server: Akamai: \n X-Akam-SW-Version - {headers.get("X-Akam-SW-Version")} \n Akamai-GRN - {headers.get('Akamai-GRN')} \n age: {headers.get("age")}  ')
+            print(f'server: Akamai: \n '
+                  f'X-Akam-SW-Version - {headers.get("X-Akam-SW-Version")} \n'
+                  f' Akamai-GRN - {headers.get('Akamai-GRN')} \n'
+                  f' age: {headers.get("age")}  ')
         elif headers.get('X-Cache') == 'Miss from cloudfront' or headers.get('X-Cache') == 'Hit from cloudfront':
-            print(f'server: cloudfront: \n via: {headers.get("Via")} \n X-Amz-Cf-Pop: {headers.get("X-Amz-Cf-Pop")} \n X-Amz-Cf-Id: {headers.get("X-Amz-Cf-Id")} \n age: {headers.get("age")}')
+            print(f'server: cloudfront: \n'
+                  f' via: {headers.get("Via")} \n'
+                  f' X-Amz-Cf-Pop: {headers.get("X-Amz-Cf-Pop")} \n'
+                  f' X-Amz-Cf-Id: {headers.get("X-Amz-Cf-Id")} \n'
+                  f' age: {headers.get("age")}')
         elif headers.get('Server','').__contains__('rdwr'):
-            cookie = headers.get('Set-Cookie')
-            print(f'server: {headers.get("Server")}: \n Cookie: {cookie} \n age: {headers.get("age")}')
+            print(f'server: {headers.get("Server")}: \n'
+                  f' __uzma: {get_cookie_from_header(headers,'__uzma')}   \n '
+                  f' __uzmb: {get_cookie_from_header(headers,'__uzmb')}   \n'
+                  f' __uzme: {get_cookie_from_header(headers,'__uzme')}   \n'
+                  f' __uzmc: {get_cookie_from_header(headers,'__uzmc')}   \n'
+                  f' __uzmd: {get_cookie_from_header(headers,'__uzmd')}   \n'
+                  f' __uzmf: {get_cookie_from_header(headers,'__uzmf')}   \n'
+                  f' uzmx: {get_cookie_from_header(headers,'uzmx')}   \n'
+                  f' age: {headers.get("age")}')
         elif headers.get('Server') == 'ddos-guard':
-            print(f'server: {headers.get('Server')}: \n Cookie: {headers.get("Set-Cookie")} \n age: {headers.get("age")}')
+            print(f'server: {headers.get('Server')}: \n'
+                  f' __ddg8_: {get_cookie_from_header(headers,'__ddg8_')} \n'
+                  f' __ddg10_: {get_cookie_from_header(headers,'__ddg10_')} \n'
+                  f' __ddg9_: {get_cookie_from_header(headers,'__ddg9_')} \n'
+                  f' __ddg1_: {get_cookie_from_header(headers,'__ddg1_')} \n'
+                  f' last-modifed: {headers.get("Last-Modified")} \n'
+                  f' Etag: {headers.get("Etag")} \n'
+                  f' age: {headers.get("age")}')
         elif headers.get('Server') == 'Angie':
-            print(f'server: {headers.get('Server' )}: \n Etag: {headers.get('Eta')} \n X-Cluster: {headers.get("X-Cluster")} \n X-Hit: {headers.get("X-Hit")}')
-
+            print(f'server: {headers.get('Server' )}: \n'
+                  f' Etag: {headers.get('Eta')} \n'
+                  f' X-Cluster: {headers.get("X-Cluster")} \n'
+                  f' X-Hit: {headers.get("X-Hit")}')
         elif headers.__contains__('x-vercel-cache') or headers.__contains__('x-vercel-id') or headers.get('Server')== 'Vercel':
-            print(f'server: vercel: \n x-vercel-id: {headers.get("x-vercel-id")} \n x-vercel-cache: {headers.get("x-vercel-cache")} \n Etag: {headers.get("Etag")} \n Last-Modified: {headers.get("Last-Modified")} \n age: {headers.get("age")}')
-
+            print(f'server: vercel: \n'
+                  f' x-vercel-id: {headers.get("x-vercel-id")} \n'
+                  f' x-vercel-cache: {headers.get("x-vercel-cache")} \n'
+                  f' Etag: {headers.get("Etag")} \n'
+                  f' Last-Modified: {headers.get("Last-Modified")} \n'
+                  f' age: {headers.get("age")}')
         elif headers.get('Server','').__contains__('Caddy') or headers.get('Server','').__contains__('nginx'):
-            print(f'server: {headers.get("Server")}: \n Cookie: {headers.get('Set-Cookie')} \n X-Node: {headers.get("X-Node")} \n X-Version: {headers.get('X-Version')} \n X-NGENIX-Cache: {headers.get('X-NGENIX-Cache')} \n age: {headers.get('age')} \n Alt-Svc{headers.get("Alt-Svc")} \n Etag: {headers.get("Etag")} \n Last-Modified: {headers.get("Last-Modified")} ')
+            print(f'server: {headers.get("Server")}: \n'
+                  f' Cookie: {headers.get('Set-Cookie')} \n'
+                  f' X-Node: {headers.get("X-Node")} \n'
+                  f' X-Version: {headers.get('X-Version')} \n'
+                  f' X-NGENIX-Cache: {headers.get('X-NGENIX-Cache')} \n'
+                  f' age: {headers.get('age')} \n'
+                  f' Alt-Svc{headers.get("Alt-Svc")} \n'
+                  f' Etag: {headers.get("Etag")} \n'
+                  f' Last-Modified: {headers.get("Last-Modified")} ')
         elif headers.get('Server','').__contains__('QRATOR'):
-            print(f'server: {headers.get('Server')}: \n ETag: {headers.get('Etag')} \n Cookie: {headers.get('Set-Cookie')} \n age: {headers.get("age")} \n last-modifed: {headers.get('Last-Modified')} \n X-Powered-By: {headers.get('X-Powered-By')}')
+            print(f'server: {headers.get('Server')}: \n'
+                  f' ETag: {headers.get('Etag')} \n'
+                  f' qrator_jsr: {get_cookie_from_header(headers,'qrator_jsr')} \n'
+                  f' age: {headers.get("age")} \n'
+                  f' last-modifed: {headers.get('Last-Modified')} \n'
+                  f' X-Powered-By: {headers.get('X-Powered-By')} \n'
+                  f' x-trace-id: {headers.get('x-trace-id')} \n'
+                  f' x-request-id: {headers.get('x-request-id')} \n'
+                  f' _ymab_param: {headers.get('_ymab_param')} ')
         elif headers.__contains__('yandex'):
-            print(f'server: yandex: \n _yasc: {headers.get('_yasc')} \n _ymab_param: {headers.get('_ymab_param')} \n XSRF-TOKEN: {headers.get('XSRF-TOKEN')} \n x-trace-id: {headers.get('x-trace-id')} \n ETag: {headers.get('Etag')} \n last-modified: {headers.get('last-modified')} ')
+            print(f'server: yandex: \n'
+                  f' _yasc: {headers.get('_yasc')} \n'
+                  f' _ymab_param: {headers.get('_ymab_param')} \n'
+                  f' XSRF-TOKEN: {headers.get('XSRF-TOKEN')} \n'
+                  f' x-trace-id: {headers.get('x-trace-id')} \n'
+                  f' ETag: {headers.get('Etag')} \n'
+                  f' last-modified: {headers.get('last-modified')} ')
         elif headers.get('Server','').__contains__('Mitelis DDoS-Mitigation'):
-            print(f'server: {headers.get('server')}: \n X-MITELIS-CACHE: {headers.get('X-MITELIS-CACHE')} \n x-powered-by: {headers.get('x-powered-by')} \n last-modified: {headers.get("last-modified")}')
+            print(f'server: {headers.get('server')}: \n'
+                  f' X-MITELIS-CACHE: {headers.get('X-MITELIS-CACHE')} \n'
+                  f' x-powered-by: {headers.get('x-powered-by')} \n'
+                  f' last-modified: {headers.get("last-modified")}')
         elif headers.get('server','').__contains__('Apache'):
-            print(f'server: {headers.get('server')} \n Set-Cookie: {headers.get('Set-Cookie')} \n Via: {headers.get('Via')}')
-
-        #print(headers.get('Server'))
-       # print(headers)
+            print(f'server: {headers.get('server')} \n'
+                  f' Set-Cookie: {headers.get('Set-Cookie')} \n'
+                  f' Via: {headers.get('Via')}')
+        elif headers.get('server','').__contains__('HAProxy'):
+            print(f'server: {headers.get("server")}: \n'
+                  f' x-request-id: {headers.get("x-request-id")} \n'
+                  f' x-chache: {headers.get("x-chache")} \n')
+        #getcookie_fromheader(headers)
+        print(headers.get('Server'))
+        print(headers)
     except KeyError:
-        print('Please enter a normal string')
+        print('Please enter a normal url')
 
 
 
